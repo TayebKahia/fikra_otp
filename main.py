@@ -22,7 +22,6 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 SECRET_KEY_PAIRS = os.getenv("SECRET_KEY_PAIRS", "")
 EMAIL_CREDENTIALS = os.getenv("EMAIL_CREDENTIALS", "")
 SECRET_WORD = os.getenv("SECRET_WORD")
-WEBHOOK_URL = os.getenv("WEBHOOK_URL")  # Your Render-provided public URL
 
 # Parse secret keys and email credentials
 SECRET_KEYS = {
@@ -253,11 +252,15 @@ def main():
 
     # Webhook setup
     PORT = int(os.environ.get("PORT", 8443))  # Default port is 8443 if not provided
+    WEBHOOK_URL = os.environ.get("WEBHOOK_URL")  # Render-provided URL
+
+    if not WEBHOOK_URL:
+        raise RuntimeError("WEBHOOK_URL environment variable is not set!")
+
+    # Run the bot with webhook
     application.run_webhook(
         listen="0.0.0.0",  # Listen on all network interfaces
         port=PORT,  # Port specified by Render
-        webhook_url=f"{WEBHOOK_URL}/{BOT_TOKEN}",  # Render-provided URL
+        webhook_url=f"{WEBHOOK_URL}/{BOT_TOKEN}",  # Webhook URL with bot token
     )
 
-if __name__ == "__main__":
-    main()
